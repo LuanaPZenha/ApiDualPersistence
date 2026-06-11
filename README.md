@@ -411,12 +411,6 @@ MONGO_URI=mongodb://mongo:27017/appdb
 
 ---
 
-## 📜 Licença
-
-Este projeto está licenciado sob a licença MIT.
-
----
-
 ## 👨‍💻 Autor
 
-Desenvolvido para fins acadêmicos e demonstração de arquitetura híbrida com múltiplos bancos de dados, autenticação JWT, segurança OWASP e conteinerização com Docker.
+Luana Zenha
