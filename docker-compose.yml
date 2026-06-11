@@ -1,0 +1,78 @@
+services:
+  app:
+    build: .
+    container_name: api-dual-persistence
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      MONGODB_URI: mongodb://mongo:27017/appdb
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: api-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-appdb}
+      POSTGRES_USER: ${POSTGRES_USER:-appuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apppassword}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-appuser} -d ${POSTGRES_DB:-appdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:7
+    container_name: api-mongo
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: api-tests
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: test
+      POSTGRES_HOST: postgres
+      MONGODB_URI: mongodb://mongo:27017/appdb_test
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    networks:
+      - app-network
+    profiles:
+      - test
+
+volumes:
+  postgres_data:
+  mongo_data:
+
+networks:
+  app-network:
+    driver: bridge
