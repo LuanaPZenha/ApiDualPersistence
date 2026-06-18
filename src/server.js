@@ -6,6 +6,7 @@ const { connectMongo } = require('./config/mongodb');
 const User = require('./models/User');
 const { patchUsersTable } = require('./migrations/patchUsers');
 const { seedAchievements } = require('./seed/achievementsSeed');
+const { seedMounts } = require('./seed/mountsSeed');
 const { seedPets } = require('./seed/petsSeed');
 const { initChatSocket } = require('./socket/chatSocket');
 

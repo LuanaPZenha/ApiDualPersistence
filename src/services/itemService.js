@@ -47,6 +47,7 @@ function mapPayload(data) {
 
 async function listItems(filters = {}) {
   const query = {};
+  const guideTypeFilter = filters.guideType || filters.tipoGuia;
 
   if (filters.rarity) {
     query.rarity = normalizeRarity(filters.rarity);
@@ -55,11 +56,20 @@ async function listItems(filters = {}) {
   }
 
   if (filters.category) {
-    query.category = normalizeCategory(filters.category, filters.guideType);
+    query.category = normalizeCategory(filters.category, guideTypeFilter);
   }
 
-  if (filters.guideType) {
-    query.guideType = normalizeGuideType(filters.guideType);
+  if (guideTypeFilter) {
+    const guideType = normalizeGuideType(guideTypeFilter);
+    if (guideType === 'CONQUISTA') {
+      query.$or = [
+        { guideType: 'CONQUISTA' },
+        { guideType: { $exists: false } },
+        { guideType: null },
+      ];
+    } else {
+      query.guideType = guideType;
+    }
   }
 
   return Item.find(query).sort({ category: 1, createdAt: -1 });
