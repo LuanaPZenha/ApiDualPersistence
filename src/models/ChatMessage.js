@@ -1,50 +1,46 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const chatMessageSchema = new mongoose.Schema(
+const ChatMessage = sequelize.define(
+  'ChatMessage',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     content: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 1000,
+      type: DataTypes.STRING(1000),
+      allowNull: false,
     },
     authorId: {
-      type: Number,
-      required: true,
-      index: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'author_id',
     },
     authorName: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      field: 'author_name',
     },
     authorUsername: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 50,
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      field: 'author_username',
     },
     room: {
-      type: String,
-      default: 'sanctuary',
-      index: true,
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: 'sanctuary',
     },
   },
   {
-    timestamps: true,
-    versionKey: false,
-    toJSON: {
-      virtuals: true,
-      transform(_doc, ret) {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        return ret;
-      },
-    },
+    tableName: 'chat_messages',
+    indexes: [
+      { fields: ['room', 'created_at'] },
+      { fields: ['author_id'] },
+    ],
   }
 );
 
-chatMessageSchema.index({ room: 1, createdAt: -1 });
-
-module.exports = mongoose.model('ChatMessage', chatMessageSchema);
+module.exports = ChatMessage;

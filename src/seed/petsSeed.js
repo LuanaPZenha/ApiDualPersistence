@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Item = require('../models/Item');
 const pets = require('../data/diabloPets');
 const { withPetRarity } = require('../data/petRarity');
@@ -9,29 +10,32 @@ async function seedPets() {
   let updated = 0;
   const titles = pets.map((pet) => pet.title);
 
-  const removed = await Item.deleteMany({
-    guideType: 'MASCOTE',
-    title: { $nin: titles },
+  const removed = await Item.destroy({
+    where: {
+      guideType: 'MASCOTE',
+      title: { [Op.notIn]: titles },
+    },
   });
-  if (removed.deletedCount > 0) {
-    console.log(`Seed de pets: ${removed.deletedCount} entradas obsoletas removidas.`);
+  if (removed > 0) {
+    console.log(`Seed de pets: ${removed} entradas obsoletas removidas.`);
   }
 
   for (const raw of pets) {
     const pet = withPetContext(withPetCategory(withPetRarity({ ...raw, guideType: 'MASCOTE' })));
-    const existing = await Item.findOne({ title: pet.title, guideType: 'MASCOTE' });
+    const existing = await Item.findOne({ where: { title: pet.title, guideType: 'MASCOTE' } });
 
     if (existing) {
-      existing.category = pet.category;
-      existing.rating = pet.rating;
-      existing.rarity = pet.rarity;
-      existing.description = pet.description;
-      existing.guide = pet.guide;
-      existing.howTo = pet.howTo;
-      existing.averageTime = pet.averageTime;
-      existing.location = pet.location;
-      if (!existing.status) existing.status = pet.status;
-      await existing.save();
+      await existing.update({
+        category: pet.category,
+        rating: pet.rating,
+        rarity: pet.rarity,
+        description: pet.description,
+        guide: pet.guide,
+        howTo: pet.howTo,
+        averageTime: pet.averageTime,
+        location: pet.location,
+        status: existing.status || pet.status,
+      });
       updated += 1;
     } else {
       await Item.create(pet);

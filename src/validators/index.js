@@ -1,11 +1,11 @@
 const { body, param } = require('express-validator');
 
-const mongoIdParam = [
-  param('id').isMongoId().withMessage('ID invalido'),
+const idParam = [
+  param('id').isInt({ min: 1 }).withMessage('ID invalido'),
 ];
 
-const mongoReplyIdParam = [
-  param('replyId').isMongoId().withMessage('ID invalido'),
+const replyIdParam = [
+  param('replyId').isInt({ min: 1 }).withMessage('ID invalido'),
 ];
 
 const USERNAME_REGEX = /^[a-zA-ZÀ-ÿ]+([._-]?[a-zA-ZÀ-ÿ]+)*$/;
@@ -224,8 +224,10 @@ const profileStatsRules = [
 ];
 
 module.exports = {
-  mongoIdParam,
-  mongoReplyIdParam,
+  idParam,
+  replyIdParam,
+  mongoIdParam: idParam,
+  mongoReplyIdParam: replyIdParam,
   userCreateRules,
   registerRules,
   userUpdateRules,

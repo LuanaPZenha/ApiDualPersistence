@@ -1,93 +1,86 @@
-const mongoose = require('mongoose');
-
-const STATUS_VALUES = ['CONCLUIDO', 'EM_ANDAMENTO', 'NA_FILA'];
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 const { RARITY_VALUES } = require('../data/rarity');
 const { ALL_ITEM_CATEGORIES, GUIDE_TYPES } = require('../data/categories');
 
-const itemSchema = new mongoose.Schema(
+const STATUS_VALUES = ['CONCLUIDO', 'EM_ANDAMENTO', 'NA_FILA'];
+
+const Item = sequelize.define(
+  'Item',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     guideType: {
-      type: String,
-      required: true,
-      enum: GUIDE_TYPES,
-      default: 'CONQUISTA',
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: 'CONQUISTA',
+      field: 'guide_type',
     },
     title: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 150,
+      type: DataTypes.STRING(150),
+      allowNull: false,
     },
     category: {
-      type: String,
-      required: true,
-      trim: true,
-      enum: ALL_ITEM_CATEGORIES,
-      maxlength: 80,
+      type: DataTypes.STRING(80),
+      allowNull: false,
     },
     rating: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 5,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: { min: 1, max: 5 },
     },
     rarity: {
-      type: String,
-      required: true,
-      enum: RARITY_VALUES,
-      default: 'COMUM',
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: 'COMUM',
     },
     status: {
-      type: String,
-      required: true,
-      enum: STATUS_VALUES,
-      default: 'NA_FILA',
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: 'NA_FILA',
     },
     description: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 500,
+      type: DataTypes.STRING(500),
+      allowNull: false,
     },
     guide: {
-      type: String,
-      trim: true,
-      maxlength: 8000,
-      default: '',
+      type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '',
     },
     howTo: {
-      type: String,
-      trim: true,
-      maxlength: 2000,
-      default: '',
+      type: DataTypes.STRING(2000),
+      allowNull: false,
+      defaultValue: '',
+      field: 'how_to',
     },
     averageTime: {
-      type: String,
-      trim: true,
-      maxlength: 120,
-      default: '',
+      type: DataTypes.STRING(120),
+      allowNull: false,
+      defaultValue: '',
+      field: 'average_time',
     },
     location: {
-      type: String,
-      trim: true,
-      maxlength: 500,
-      default: '',
+      type: DataTypes.STRING(500),
+      allowNull: false,
+      defaultValue: '',
     },
   },
   {
-    timestamps: true,
-    versionKey: false,
-    toJSON: {
-      virtuals: true,
-      transform(_doc, ret) {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        return ret;
-      },
-    },
+    tableName: 'items',
+    indexes: [
+      { fields: ['guide_type'] },
+      { fields: ['category'] },
+      { fields: ['title', 'guide_type'] },
+    ],
   }
 );
 
-module.exports = mongoose.model('Item', itemSchema);
+module.exports = Item;
 module.exports.STATUS_VALUES = STATUS_VALUES;
 module.exports.RARITY_VALUES = RARITY_VALUES;
+module.exports.GUIDE_TYPES = GUIDE_TYPES;
+module.exports.ALL_ITEM_CATEGORIES = ALL_ITEM_CATEGORIES;

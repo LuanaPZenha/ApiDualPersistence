@@ -1,66 +1,61 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
 const CATEGORY_VALUES = ['DUVIDAS', 'BUILDS', 'ENDGAME', 'GERAL', 'CONQUISTAS'];
 
-const postSchema = new mongoose.Schema(
+const Post = sequelize.define(
+  'Post',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     title: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 200,
+      type: DataTypes.STRING(200),
+      allowNull: false,
     },
     content: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 5000,
+      type: DataTypes.STRING(5000),
+      allowNull: false,
     },
     category: {
-      type: String,
-      required: true,
-      enum: CATEGORY_VALUES,
-      default: 'GERAL',
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: 'GERAL',
     },
     authorId: {
-      type: Number,
-      required: true,
-      index: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'author_id',
     },
     authorName: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      field: 'author_name',
     },
     authorUsername: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 50,
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      field: 'author_username',
     },
     replyCount: {
-      type: Number,
-      default: 0,
-      min: 0,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      field: 'reply_count',
+      validate: { min: 0 },
     },
   },
   {
-    timestamps: true,
-    versionKey: false,
-    toJSON: {
-      virtuals: true,
-      transform(_doc, ret) {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        return ret;
-      },
-    },
+    tableName: 'posts',
+    indexes: [
+      { fields: ['created_at'] },
+      { fields: ['category', 'created_at'] },
+      { fields: ['author_id'] },
+    ],
   }
 );
 
-postSchema.index({ createdAt: -1 });
-postSchema.index({ category: 1, createdAt: -1 });
-
-module.exports = mongoose.model('Post', postSchema);
+module.exports = Post;
 module.exports.CATEGORY_VALUES = CATEGORY_VALUES;

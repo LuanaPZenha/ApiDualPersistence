@@ -44,7 +44,7 @@ describe('Motos CRUD', () => {
       .send({ brand: 'Kawasaki', model: 'Ninja', year: 2022, engineCapacity: 400 });
 
     const response = await request(app)
-      .get(`/api/motos/${created.body._id}`)
+      .get(`/api/motos/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(200);
@@ -58,7 +58,7 @@ describe('Motos CRUD', () => {
       .send({ brand: 'Suzuki', model: 'GSX', year: 2021, engineCapacity: 250 });
 
     const response = await request(app)
-      .put(`/api/motos/${created.body._id}`)
+      .put(`/api/motos/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ brand: 'Suzuki', model: 'GSX', year: 2022, engineCapacity: 250 });
 
@@ -73,7 +73,7 @@ describe('Motos CRUD', () => {
       .send({ brand: 'BMW', model: 'G310', year: 2020, engineCapacity: 310 });
 
     const response = await request(app)
-      .delete(`/api/motos/${created.body._id}`)
+      .delete(`/api/motos/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(204);

@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Item = require('../models/Item');
 const AppError = require('../utils/AppError');
 const { RARITY_VALUES } = require('../data/rarity');
@@ -45,38 +46,44 @@ function mapPayload(data) {
   };
 }
 
-async function listItems(filters = {}) {
-  const query = {};
+function buildWhere(filters = {}) {
+  const where = {};
   const guideTypeFilter = filters.guideType || filters.tipoGuia;
 
   if (filters.rarity) {
-    query.rarity = normalizeRarity(filters.rarity);
+    where.rarity = normalizeRarity(filters.rarity);
   } else if (filters.rareOnly === 'true' || filters.rareOnly === true) {
-    query.rarity = { $in: ['PREMIUM', 'RARA', 'EPICA', 'LENDARIA', 'MITICA'] };
+    where.rarity = { [Op.in]: ['PREMIUM', 'RARA', 'EPICA', 'LENDARIA', 'MITICA'] };
   }
 
   if (filters.category) {
-    query.category = normalizeCategory(filters.category, guideTypeFilter);
+    where.category = normalizeCategory(filters.category, guideTypeFilter);
   }
 
   if (guideTypeFilter) {
     const guideType = normalizeGuideType(guideTypeFilter);
     if (guideType === 'CONQUISTA') {
-      query.$or = [
+      where[Op.or] = [
         { guideType: 'CONQUISTA' },
-        { guideType: { $exists: false } },
         { guideType: null },
       ];
     } else {
-      query.guideType = guideType;
+      where.guideType = guideType;
     }
   }
 
-  return Item.find(query).sort({ category: 1, createdAt: -1 });
+  return where;
+}
+
+async function listItems(filters = {}) {
+  return Item.findAll({
+    where: buildWhere(filters),
+    order: [['category', 'ASC'], ['createdAt', 'DESC']],
+  });
 }
 
 async function getItemById(id) {
-  const item = await Item.findById(id);
+  const item = await Item.findByPk(id);
   if (!item) {
     throw new AppError('Conquista nao encontrada', 404);
   }
@@ -88,21 +95,14 @@ async function createItem(data) {
 }
 
 async function updateItem(id, data) {
-  const item = await Item.findByIdAndUpdate(id, mapPayload(data), {
-    new: true,
-    runValidators: true,
-  });
-  if (!item) {
-    throw new AppError('Conquista nao encontrada', 404);
-  }
+  const item = await getItemById(id);
+  await item.update(mapPayload(data));
   return item;
 }
 
 async function deleteItem(id) {
-  const item = await Item.findByIdAndDelete(id);
-  if (!item) {
-    throw new AppError('Conquista nao encontrada', 404);
-  }
+  const item = await getItemById(id);
+  await item.destroy();
 }
 
 module.exports = {

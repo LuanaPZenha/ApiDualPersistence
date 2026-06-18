@@ -1,31 +1,31 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const marcaRoupaSchema = new mongoose.Schema(
+const MarcaRoupa = sequelize.define(
+  'MarcaRoupa',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     name: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
       unique: true,
     },
     country: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 80,
+      type: DataTypes.STRING(80),
+      allowNull: false,
     },
     segment: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 80,
+      type: DataTypes.STRING(80),
+      allowNull: false,
     },
   },
   {
-    timestamps: true,
-    versionKey: false,
+    tableName: 'marcas_roupa',
   }
 );
 
-module.exports = mongoose.model('MarcaRoupa', marcaRoupaSchema);
+module.exports = MarcaRoupa;

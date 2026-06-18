@@ -1,36 +1,40 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const motoSchema = new mongoose.Schema(
+const Moto = sequelize.define(
+  'Moto',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     brand: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
     },
     model: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
     },
     year: {
-      type: Number,
-      required: true,
-      min: 1885,
-      max: new Date().getFullYear() + 1,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 1885,
+        max: new Date().getFullYear() + 1,
+      },
     },
     engineCapacity: {
-      type: Number,
-      required: true,
-      min: 50,
-      max: 2500,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'engine_capacity',
+      validate: { min: 50, max: 2500 },
     },
   },
   {
-    timestamps: true,
-    versionKey: false,
+    tableName: 'motos',
   }
 );
 
-module.exports = mongoose.model('Moto', motoSchema);
+module.exports = Moto;

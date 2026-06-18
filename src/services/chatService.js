@@ -7,7 +7,7 @@ function toMessageJSON(message) {
   if (!message) return null;
   const doc = message.toJSON ? message.toJSON() : message;
   return {
-    id: doc.id || String(doc._id),
+    id: doc.id,
     content: doc.content,
     authorId: doc.authorId,
     authorName: doc.authorName,
@@ -19,23 +19,23 @@ function toMessageJSON(message) {
 
 async function listRecentMessages(limit = 50, room = DEFAULT_ROOM) {
   const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), MAX_HISTORY);
-  const messages = await ChatMessage.find({ room })
-    .sort({ createdAt: -1 })
-    .limit(safeLimit);
+  const messages = await ChatMessage.findAll({
+    where: { room },
+    order: [['createdAt', 'DESC']],
+    limit: safeLimit,
+  });
 
   return messages.reverse().map(toMessageJSON);
 }
 
 async function createMessage(data, room = DEFAULT_ROOM) {
-  const message = await ChatMessage.create({
+  return ChatMessage.create({
     content: data.content,
     authorId: data.authorId,
     authorName: data.authorName,
     authorUsername: data.authorUsername,
     room,
   });
-
-  return message;
 }
 
 module.exports = {

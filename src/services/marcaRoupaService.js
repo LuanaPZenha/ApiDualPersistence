@@ -2,11 +2,11 @@ const MarcaRoupa = require('../models/MarcaRoupa');
 const AppError = require('../utils/AppError');
 
 async function listMarcas() {
-  return MarcaRoupa.find().sort({ createdAt: -1 });
+  return MarcaRoupa.findAll({ order: [['createdAt', 'DESC']] });
 }
 
 async function getMarcaById(id) {
-  const marca = await MarcaRoupa.findById(id);
+  const marca = await MarcaRoupa.findByPk(id);
   if (!marca) {
     throw new AppError('Marca de roupa nao encontrada', 404);
   }
@@ -18,21 +18,14 @@ async function createMarca(data) {
 }
 
 async function updateMarca(id, data) {
-  const marca = await MarcaRoupa.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  });
-  if (!marca) {
-    throw new AppError('Marca de roupa nao encontrada', 404);
-  }
+  const marca = await getMarcaById(id);
+  await marca.update(data);
   return marca;
 }
 
 async function deleteMarca(id) {
-  const marca = await MarcaRoupa.findByIdAndDelete(id);
-  if (!marca) {
-    throw new AppError('Marca de roupa nao encontrada', 404);
-  }
+  const marca = await getMarcaById(id);
+  await marca.destroy();
 }
 
 module.exports = {

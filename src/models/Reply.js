@@ -1,50 +1,45 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const replySchema = new mongoose.Schema(
+const Reply = sequelize.define(
+  'Reply',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     postId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Post',
-      required: true,
-      index: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'post_id',
     },
     content: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 3000,
+      type: DataTypes.STRING(3000),
+      allowNull: false,
     },
     authorId: {
-      type: Number,
-      required: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: 'author_id',
     },
     authorName: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      field: 'author_name',
     },
     authorUsername: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 50,
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      field: 'author_username',
     },
   },
   {
-    timestamps: true,
-    versionKey: false,
-    toJSON: {
-      virtuals: true,
-      transform(_doc, ret) {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        return ret;
-      },
-    },
+    tableName: 'replies',
+    indexes: [
+      { fields: ['post_id', 'created_at'] },
+    ],
   }
 );
 
-replySchema.index({ postId: 1, createdAt: 1 });
-
-module.exports = mongoose.model('Reply', replySchema);
+module.exports = Reply;

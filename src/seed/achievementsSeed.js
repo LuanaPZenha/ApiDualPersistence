@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Item = require('../models/Item');
 const achievements = require('../data/diabloAchievements');
 const { withRarity } = require('../data/rarity');
@@ -10,26 +11,29 @@ async function seedAchievements() {
 
   for (const raw of achievements) {
     const achievement = withContext(withCategory(withRarity({ ...raw, guideType: 'CONQUISTA' })));
-    let existing = await Item.findOne({ title: achievement.title, guideType: 'CONQUISTA' });
-    if (!existing) {
-      existing = await Item.findOne({ title: achievement.title, guideType: { $exists: false } });
-    }
-    if (!existing) {
-      existing = await Item.findOne({ title: achievement.title, guideType: null });
-    }
+    const existing = await Item.findOne({
+      where: {
+        title: achievement.title,
+        [Op.or]: [
+          { guideType: 'CONQUISTA' },
+          { guideType: null },
+        ],
+      },
+    });
 
     if (existing) {
-      existing.guideType = achievement.guideType || 'CONQUISTA';
-      existing.category = achievement.category;
-      existing.rating = achievement.rating;
-      existing.rarity = achievement.rarity;
-      existing.description = achievement.description;
-      existing.guide = achievement.guide;
-      existing.howTo = achievement.howTo;
-      existing.averageTime = achievement.averageTime;
-      existing.location = achievement.location;
-      if (!existing.status) existing.status = achievement.status;
-      await existing.save();
+      await existing.update({
+        guideType: achievement.guideType || 'CONQUISTA',
+        category: achievement.category,
+        rating: achievement.rating,
+        rarity: achievement.rarity,
+        description: achievement.description,
+        guide: achievement.guide,
+        howTo: achievement.howTo,
+        averageTime: achievement.averageTime,
+        location: achievement.location,
+        status: existing.status || achievement.status,
+      });
       updated += 1;
     } else {
       await Item.create(achievement);

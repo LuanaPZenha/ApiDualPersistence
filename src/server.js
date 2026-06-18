@@ -2,7 +2,7 @@ const http = require('http');
 const app = require('./app');
 const config = require('./config');
 const { connectPostgres, syncPostgres } = require('./config/database');
-const { connectMongo } = require('./config/mongodb');
+require('./models');
 const User = require('./models/User');
 const { patchUsersTable } = require('./migrations/patchUsers');
 const { seedAchievements } = require('./seed/achievementsSeed');
@@ -60,7 +60,6 @@ async function startServer() {
     } catch (error) {
       console.warn('Patch users (pode ignorar se ja aplicado):', error.message);
     }
-    await connectMongo();
     await seedAdminUser();
     await runSeed('conquistas', seedAchievements);
     await runSeed('montarias', seedMounts);

@@ -1,5 +1,6 @@
 require('dotenv').config();
-const { connectMongo, disconnectMongo } = require('../config/mongodb');
+const { connectPostgres, syncPostgres } = require('../config/database');
+require('../models');
 const { seedAchievements } = require('../seed/achievementsSeed');
 const { seedMounts } = require('../seed/mountsSeed');
 const { seedPets } = require('../seed/petsSeed');
@@ -7,13 +8,15 @@ const { seedPets } = require('../seed/petsSeed');
 async function main() {
   const only = process.argv[2];
 
-  await connectMongo();
+  await connectPostgres();
+  await syncPostgres();
 
   if (!only || only === 'achievements') await seedAchievements();
   if (!only || only === 'mounts') await seedMounts();
   if (!only || only === 'pets') await seedPets();
 
-  await disconnectMongo();
+  const { sequelize } = require('../config/database');
+  await sequelize.close();
   console.log('Seeds concluidos.');
 }
 

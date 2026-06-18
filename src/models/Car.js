@@ -1,36 +1,38 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 
-const carSchema = new mongoose.Schema(
+const Car = sequelize.define(
+  'Car',
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     brand: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
     },
     model: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 100,
+      type: DataTypes.STRING(100),
+      allowNull: false,
     },
     year: {
-      type: Number,
-      required: true,
-      min: 1886,
-      max: new Date().getFullYear() + 1,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: 1886,
+        max: new Date().getFullYear() + 1,
+      },
     },
     color: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 50,
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
   },
   {
-    timestamps: true,
-    versionKey: false,
+    tableName: 'cars',
   }
 );
 
-module.exports = mongoose.model('Car', carSchema);
+module.exports = Car;

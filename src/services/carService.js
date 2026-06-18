@@ -2,11 +2,11 @@ const Car = require('../models/Car');
 const AppError = require('../utils/AppError');
 
 async function listCars() {
-  return Car.find().sort({ createdAt: -1 });
+  return Car.findAll({ order: [['createdAt', 'DESC']] });
 }
 
 async function getCarById(id) {
-  const car = await Car.findById(id);
+  const car = await Car.findByPk(id);
   if (!car) {
     throw new AppError('Carro nao encontrado', 404);
   }
@@ -18,21 +18,14 @@ async function createCar(data) {
 }
 
 async function updateCar(id, data) {
-  const car = await Car.findByIdAndUpdate(id, data, {
-    new: true,
-    runValidators: true,
-  });
-  if (!car) {
-    throw new AppError('Carro nao encontrado', 404);
-  }
+  const car = await getCarById(id);
+  await car.update(data);
   return car;
 }
 
 async function deleteCar(id) {
-  const car = await Car.findByIdAndDelete(id);
-  if (!car) {
-    throw new AppError('Carro nao encontrado', 404);
-  }
+  const car = await getCarById(id);
+  await car.destroy();
 }
 
 module.exports = {

@@ -43,7 +43,7 @@ describe('Marcas de Roupa CRUD', () => {
       .send({ name: 'Zara', country: 'Espanha', segment: 'Fast Fashion' });
 
     const response = await request(app)
-      .get(`/api/marcas-roupa/${created.body._id}`)
+      .get(`/api/marcas-roupa/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(200);
@@ -57,7 +57,7 @@ describe('Marcas de Roupa CRUD', () => {
       .send({ name: 'H&M', country: 'Suecia', segment: 'Fast Fashion' });
 
     const response = await request(app)
-      .put(`/api/marcas-roupa/${created.body._id}`)
+      .put(`/api/marcas-roupa/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ name: 'H&M', country: 'Suecia', segment: 'Premium' });
 
@@ -72,7 +72,7 @@ describe('Marcas de Roupa CRUD', () => {
       .send({ name: 'Puma', country: 'Alemanha', segment: 'Esportivo' });
 
     const response = await request(app)
-      .delete(`/api/marcas-roupa/${created.body._id}`)
+      .delete(`/api/marcas-roupa/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(204);

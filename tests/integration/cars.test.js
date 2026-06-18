@@ -22,7 +22,7 @@ describe('Cars CRUD', () => {
 
     expect(response.status).toBe(201);
     expect(response.body.brand).toBe('Toyota');
-    carId = response.body._id;
+    carId = response.body.id;
   });
 
   it('GET /api/cars lista carros', async () => {
@@ -46,7 +46,7 @@ describe('Cars CRUD', () => {
       .send({ brand: 'Ford', model: 'Ka', year: 2022, color: 'Branco' });
 
     const response = await request(app)
-      .get(`/api/cars/${created.body._id}`)
+      .get(`/api/cars/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(200);
@@ -60,7 +60,7 @@ describe('Cars CRUD', () => {
       .send({ brand: 'VW', model: 'Gol', year: 2021, color: 'Azul' });
 
     const response = await request(app)
-      .put(`/api/cars/${created.body._id}`)
+      .put(`/api/cars/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ brand: 'VW', model: 'Gol', year: 2021, color: 'Vermelho' });
 
@@ -75,7 +75,7 @@ describe('Cars CRUD', () => {
       .send({ brand: 'Fiat', model: 'Uno', year: 2020, color: 'Verde' });
 
     const response = await request(app)
-      .delete(`/api/cars/${created.body._id}`)
+      .delete(`/api/cars/${created.body.id}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(204);

@@ -24,9 +24,6 @@ module.exports = {
     ssl: process.env.POSTGRES_SSL === 'true'
       || Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL),
   },
-  mongodb: {
-    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/appdb',
-  },
   corsOrigin: parseCorsOrigin(process.env.CORS_ORIGIN),
   rateLimit: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,

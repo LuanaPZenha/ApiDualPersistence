@@ -10,19 +10,20 @@ async function seedMounts() {
 
   for (const raw of mounts) {
     const mount = withMountContext(withMountCategory(withMountRarity({ ...raw, guideType: 'MONTARIA' })));
-    const existing = await Item.findOne({ title: mount.title, guideType: 'MONTARIA' });
+    const existing = await Item.findOne({ where: { title: mount.title, guideType: 'MONTARIA' } });
 
     if (existing) {
-      existing.category = mount.category;
-      existing.rating = mount.rating;
-      existing.rarity = mount.rarity;
-      existing.description = mount.description;
-      existing.guide = mount.guide;
-      existing.howTo = mount.howTo;
-      existing.averageTime = mount.averageTime;
-      existing.location = mount.location;
-      if (!existing.status) existing.status = mount.status;
-      await existing.save();
+      await existing.update({
+        category: mount.category,
+        rating: mount.rating,
+        rarity: mount.rarity,
+        description: mount.description,
+        guide: mount.guide,
+        howTo: mount.howTo,
+        averageTime: mount.averageTime,
+        location: mount.location,
+        status: existing.status || mount.status,
+      });
       updated += 1;
     } else {
       await Item.create(mount);
