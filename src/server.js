@@ -40,6 +40,17 @@ async function seedAdminUser() {
   }
 }
 
+async function runSeed(label, fn) {
+  try {
+    await fn();
+  } catch (error) {
+    console.error(`Seed ${label} falhou:`, error.message);
+    if (config.env !== 'production') {
+      console.error(error.stack);
+    }
+  }
+}
+
 async function startServer() {
   try {
     await connectPostgres();
@@ -51,9 +62,9 @@ async function startServer() {
     }
     await connectMongo();
     await seedAdminUser();
-    await seedAchievements();
-    await seedMounts();
-    await seedPets();
+    await runSeed('conquistas', seedAchievements);
+    await runSeed('montarias', seedMounts);
+    await runSeed('pets', seedPets);
 
     const server = http.createServer(app);
     initChatSocket(server);
