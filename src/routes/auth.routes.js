@@ -1,7 +1,7 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const validate = require('../middlewares/validate');
-const { loginRules, userCreateRules } = require('../validators');
+const { loginRules, registerRules, userCreateRules } = require('../validators');
 const { authLimiter } = require('../middlewares/security');
 const { authenticate } = require('../middlewares/auth');
 
@@ -30,7 +30,7 @@ const router = express.Router();
  *       201:
  *         description: Usuario registrado com sucesso
  */
-router.post('/register', authLimiter, userCreateRules, validate, authController.register);
+router.post('/register', authLimiter, registerRules, validate, authController.register);
 
 /**
  * @swagger

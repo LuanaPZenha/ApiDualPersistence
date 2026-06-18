@@ -4,6 +4,7 @@
   "description": "API Node.js/Express com persistencia NoSQL e SQL, JWT, testes e Docker",
   "main": "src/server.js",
   "scripts": {
+    "start": "node src/server.js",
     "test": "cross-env NODE_ENV=test jest --runInBand --forceExit",
     "test:integration": "cross-env NODE_ENV=test jest --runInBand --forceExit tests/integration"
   },
@@ -29,6 +30,7 @@
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5",
+    "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },

@@ -1,0 +1,36 @@
+# Render Blueprint — API Grim Codex
+# Repo: api-dual-persistence
+# Deploy: conecte este repositório no Render → New → Blueprint
+
+databases:
+  - name: grimcodex-postgres
+    databaseName: grimcodex
+    user: grimcodex
+    plan: free
+
+services:
+  - type: web
+    name: grimcodex-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: grimcodex-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@example.com
+      - key: ADMIN_PASSWORD
+        sync: false

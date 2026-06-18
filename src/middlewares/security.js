@@ -2,6 +2,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const config = require('../config');
+const { resolveCorsOrigin } = require('../config/cors');
 
 const helmetMiddleware = helmet({
   contentSecurityPolicy: config.env === 'production',
@@ -9,9 +10,10 @@ const helmetMiddleware = helmet({
 });
 
 const corsMiddleware = cors({
-  origin: config.corsOrigin === '*' ? true : config.corsOrigin,
+  origin: config.corsOrigin === '*' ? true : resolveCorsOrigin,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 });
 
 const noopLimiter = (_req, _res, next) => next();

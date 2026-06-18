@@ -14,8 +14,18 @@ const userRoutes = require('./routes/user.routes');
 const carRoutes = require('./routes/car.routes');
 const motoRoutes = require('./routes/moto.routes');
 const marcaRoupaRoutes = require('./routes/marcaRoupa.routes');
+const itemRoutes = require('./routes/item.routes');
+const postRoutes = require('./routes/post.routes');
+const chatRoutes = require('./routes/chat.routes');
+const profileRoutes = require('./routes/profile.routes');
+
+const config = require('./config');
 
 const app = express();
+
+if (config.env === 'production') {
+  app.set('trust proxy', 1);
+}
 
 app.disable('x-powered-by');
 app.use(helmetMiddleware);
@@ -48,6 +58,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/motos', motoRoutes);
 app.use('/api/marcas-roupa', marcaRoupaRoutes);
+app.use('/api/items', itemRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/profiles', profileRoutes);
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.get('/', (_req, res) => {
